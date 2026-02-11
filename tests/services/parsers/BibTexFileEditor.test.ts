@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sortBibTexEntriesAlphabetically, upsertAndSortBibTexEntries } from '../../../services/parsers/BibTexFileEditor';
+import { sortBibTexEntriesAlphabetically, upsertAndSortBibTexEntries } from '../../../src/services/parsers/BibTexFileEditor';
 
 describe('BibTexFileEditor', () => {
   it('sorts entries alphabetically by citation key', () => {

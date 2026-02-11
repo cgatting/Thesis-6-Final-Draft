@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { OpenAlexService } from '../../services/OpenAlexService';
-import { ProcessedReference } from '../../types';
+import { OpenAlexService } from '../../src/services/OpenAlexService';
+import { ProcessedReference } from '../../src/types';
 
 describe('OpenAlexService', () => {
   let service: OpenAlexService;

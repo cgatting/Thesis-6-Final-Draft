@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LatexParser } from '../../../services/parsers/LatexParser';
+import { LatexParser } from '../../../src/services/parsers/LatexParser';
 
 describe('LatexParser Citations', () => {
   const parser = new LatexParser();

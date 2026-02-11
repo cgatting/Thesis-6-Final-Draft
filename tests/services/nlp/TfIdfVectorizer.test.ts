@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TfIdfVectorizer, cosineSimilarity } from '../../../services/nlp/TfIdfVectorizer';
+import { TfIdfVectorizer, cosineSimilarity } from '../../../src/services/nlp/TfIdfVectorizer';
 
 describe('TfIdfVectorizer', () => {
   it('should correctly fit and transform documents', () => {

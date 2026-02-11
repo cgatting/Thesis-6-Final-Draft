@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { BibTexParser } from '../../../services/parsers/BibTexParser';
-import { unwrap } from '../../../utils/result';
+import { BibTexParser } from '../../../src/services/parsers/BibTexParser';
+import { unwrap } from '../../../src/utils/result';
 
 describe('BibTexParser', () => {
   it('should parse standard bibtex entries', () => {
