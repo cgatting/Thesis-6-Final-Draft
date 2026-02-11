@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+
+  /* Custom User Palette */
+  --color-palette-black: #000000;
+  --color-palette-red: #D00000;
+  --color-palette-gold: #DB9E5C;
+  --color-palette-cream: #EDE0C0;
+  --color-palette-green: #3A523D;
+
+  /* Brand Colors - Mapped to Gold (#DB9E5C) */
+  --color-brand-50: #fefcf5;
+  --color-brand-100: #fdf6e6;
+  --color-brand-200: #fae8c2;
+  --color-brand-300: #f6da9e;
+  --color-brand-400: #f2cb7a;
+  --color-brand-500: #db9e5c;
+  --color-brand-600: #b07e4a;
+  --color-brand-700: #845f37;
+  --color-brand-800: #583f25;
+  --color-brand-900: #2c2012;
+  --color-brand-950: #1a1208;
+
+  /* Surface/Slate Colors - Mapped to Black/Green/Cream Theme */
+  --color-slate-50: #fbf8f0;
+  --color-slate-100: #ede0c0; /* Cream (Main Text) */
+  --color-slate-200: #e6d5aa;
+  --color-slate-300: #dec994;
+  --color-slate-400: #a89875; /* Muted Text */
+  --color-slate-500: #807050;
+  --color-slate-600: #5a6b5d;
+  --color-slate-700: #3a523d; /* Dark Green (Borders/Accents) */
+  --color-slate-800: #1a261c; /* Darker Green/Black (Card Borders) */
+  --color-slate-900: #0a0f0a; /* Card BG (Almost Black) */
+  --color-slate-950: #000000; /* Main BG (Black) */
+
+  /* Functional Colors */
+  --color-red-500: #d00000; /* Red from palette */
+  --color-green-500: #3a523d; /* Green from palette */
+  
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(219, 158, 92, 0.2); /* Gold glow */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    /* Dark Mode Base */
+    @apply antialiased text-slate-100 bg-slate-950 font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-slate-100;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-slate-900 border border-slate-700 shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-slate-900 border border-slate-700 shadow-md transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply text-slate-100; /* Fallback/Reset */
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  /* Custom Scrollbar - Dark Mode */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full hover:bg-slate-600 transition-colors;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
