@@ -56,9 +56,9 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 40) return 'text-green-400 bg-green-500/10 border-green-500/20 hover:bg-green-500/20 ring-green-500/30';
-    if (score >= 25) return 'text-blue-400 bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 ring-blue-500/30';
-    if (score >= 18) return 'text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 ring-amber-500/30';
+    if (score >= 40) return 'text-brand-400 bg-brand-500/10 border-brand-500/20 hover:bg-brand-500/20 ring-brand-500/30';
+    if (score >= 25) return 'text-slate-200 bg-slate-500/10 border-slate-500/20 hover:bg-slate-500/20 ring-slate-500/30';
+    if (score >= 18) return 'text-slate-400 bg-slate-700/30 border-slate-700/50 hover:bg-slate-700/40 ring-slate-700/30';
     return 'text-red-400 bg-red-500/10 border-red-500/20 hover:bg-red-500/20 ring-red-500/30';
   };
 
@@ -94,10 +94,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                 highlightClass = 'bg-red-500/5 hover:bg-red-500/10 border-red-500/30';
                 category = 'missing_citation';
               } else if (sent.gapIdentified) {
-                highlightClass = 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/30';
+                highlightClass = 'bg-red-500/5 hover:bg-red-500/10 border-red-500/30';
                 category = 'gap';
               } else if (sent.isHighImpact) {
-                highlightClass = 'bg-purple-500/5 hover:bg-purple-500/10 border-purple-500/30';
+                highlightClass = 'bg-brand-500/5 hover:bg-brand-500/10 border-brand-500/30';
                 category = 'impact';
               }
 
@@ -209,8 +209,8 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                       </div>
                       <div className="flex items-baseline gap-1">
                         <span className={`text-4xl font-display font-bold tracking-tighter ${
-                          computeWeightedTotal(activeAnalysis.scores) >= 70 ? 'text-green-400' : 
-                          computeWeightedTotal(activeAnalysis.scores) >= 50 ? 'text-amber-400' : 'text-red-400'
+                          computeWeightedTotal(activeAnalysis.scores) >= 70 ? 'text-brand-400' : 
+                          computeWeightedTotal(activeAnalysis.scores) >= 50 ? 'text-slate-200' : 'text-red-400'
                         }`}>
                           {computeWeightedTotal(activeAnalysis.scores).toFixed(2)}
                         </span>
@@ -298,7 +298,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                       {betterSources.length > 0 && (
                           <div className="space-y-3 animate-scale-in">
                               <div className="flex justify-between items-center">
-                                  <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider flex items-center gap-1">
+                                  <span className="text-[10px] font-bold text-brand-400 uppercase tracking-wider flex items-center gap-1">
                                     <Icons.Success className="w-3 h-3" /> Recommended Sources
                                   </span>
                               </div>
@@ -306,13 +306,13 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                               {betterSources.map((source, idx) => {
                                 const score = source.scores ? computeWeightedTotal(source.scores) : 0;
                                 return (
-                                <div key={source.id || idx} className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+                                <div key={source.id || idx} className="p-4 bg-brand-500/10 border border-brand-500/20 rounded-xl">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-bold text-green-300 bg-green-500/20 px-2 py-0.5 rounded-full border border-green-500/20">Option {idx + 1}</span>
+                                            <span className="text-[10px] font-bold text-brand-300 bg-brand-500/20 px-2 py-0.5 rounded-full border border-brand-500/20">Option {idx + 1}</span>
                                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                                                score >= 70 ? 'text-green-300 bg-green-500/20 border-green-500/20' :
-                                                score >= 50 ? 'text-amber-300 bg-amber-500/20 border-amber-500/20' :
+                                                score >= 70 ? 'text-brand-300 bg-brand-500/20 border-brand-500/20' :
+                                                score >= 50 ? 'text-slate-300 bg-slate-500/20 border-slate-500/20' :
                                                 'text-red-300 bg-red-500/20 border-red-500/20'
                                             }`}>
                                                 {score.toFixed(0)}/100 Match
@@ -346,8 +346,8 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                                         disabled={updateStatus === 'success'}
                                         className={`w-full py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
                                           updateStatus === 'success' 
-                                            ? 'bg-green-600 text-white cursor-default' 
-                                            : 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20'
+                                            ? 'bg-brand-600 text-white cursor-default' 
+                                            : 'bg-brand-600 hover:bg-brand-500 text-white shadow-lg shadow-brand-900/20'
                                         }`}
                                     >
                                         {updateStatus === 'success' ? (
@@ -381,8 +381,8 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                             >
                                <span className="capitalize text-slate-400 font-bold">{key}</span>
                                <span className={`font-bold px-2 py-0.5 rounded ${
-                                 val > 70 ? 'bg-green-500/10 text-green-400' : 
-                                 val > 50 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'
+                                 val > 70 ? 'bg-brand-500/10 text-brand-400' : 
+                                 val > 50 ? 'bg-slate-500/10 text-slate-200' : 'bg-red-500/10 text-red-400'
                                }`}>{val.toFixed(2)}</span>
                             </div>
                           ))}
@@ -400,12 +400,12 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                              </span>
                         )}
                         {activeAnalysis.category === 'impact' && (
-                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold uppercase tracking-widest mb-3 border border-purple-500/20">
+                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-400 text-[10px] font-bold uppercase tracking-widest mb-3 border border-brand-500/20">
                                <Icons.Authority className="w-3 h-3" /> High Impact
                              </span>
                         )}
                         {activeAnalysis.category === 'gap' && (
-                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold uppercase tracking-widest mb-3 border border-amber-500/20">
+                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-widest mb-3 border border-red-500/20">
                                <Icons.Search className="w-3 h-3" /> Research Gap
                              </span>
                         )}
@@ -507,7 +507,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
 
                {/* High Impact Section */}
                <div>
-                 <h4 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                 <h4 className="text-xs font-bold text-brand-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                    <Icons.Authority className="w-3 h-3" /> High Impact ({highImpactSentences.length})
                  </h4>
                  {highImpactSentences.length > 0 ? (
@@ -527,10 +527,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                               triggerPhrase: item.triggerPhrase
                             });
                          }}
-                         className="w-full text-left p-3 rounded-xl bg-purple-500/5 border border-purple-500/10 hover:bg-purple-500/10 transition-colors group"
+                         className="w-full text-left p-3 rounded-xl bg-brand-500/5 border border-brand-500/10 hover:bg-brand-500/10 transition-colors group"
                        >
                          <div className="flex items-start gap-2">
-                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
                            <p className="text-xs text-slate-300 line-clamp-2 group-hover:text-white transition-colors">
                              "{item.text}"
                            </p>
@@ -545,7 +545,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
 
                {/* Gaps Section */}
                <div>
-                 <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                 <h4 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                    <Icons.Search className="w-3 h-3" /> Research Gaps ({identifiedGaps.length})
                  </h4>
                  {identifiedGaps.length > 0 ? (
@@ -565,10 +565,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                               triggerPhrase: item.triggerPhrase
                             });
                          }}
-                         className="w-full text-left p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors group"
+                         className="w-full text-left p-3 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 transition-colors group"
                        >
                          <div className="flex items-start gap-2">
-                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                            <p className="text-xs text-slate-300 line-clamp-2 group-hover:text-white transition-colors">
                              "{item.text}"
                            </p>
@@ -594,11 +594,11 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                         triggerPhrase: "How it works"
                       });
                     }}
-                    className="flex gap-3 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors cursor-pointer group"
+                    className="flex gap-3 p-4 rounded-xl bg-brand-500/5 border border-brand-500/10 hover:bg-brand-500/10 transition-colors cursor-pointer group"
                   >
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold mt-0.5 border border-amber-500/20 group-hover:scale-110 transition-transform">?</span>
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-[10px] font-bold mt-0.5 border border-brand-500/20 group-hover:scale-110 transition-transform">?</span>
                     <p className="text-sm text-slate-300 leading-snug group-hover:text-white transition-colors">
-                      No major gaps detected. <span className="text-amber-400/80 group-hover:text-amber-400">Click to see how to highlight research gaps.</span>
+                      No major gaps detected. <span className="text-brand-400/80 group-hover:text-brand-400">Click to see how to highlight research gaps.</span>
                     </p>
                   </div>
                 )}

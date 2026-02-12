@@ -166,10 +166,10 @@ function App() {
             </div>
 
             {/* Upload Section */}
-            <div className="glass-card rounded-3xl p-2 md:p-3 shadow-2xl shadow-brand-900/5 ring-1 ring-white/50">
-               <div className="bg-slate-50/50 rounded-2xl border border-slate-200/50 overflow-hidden">
-                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200/50">
-                    <div className="p-8 md:p-12 hover:bg-white/40 transition-colors duration-500">
+            <div className="glass-card rounded-3xl p-2 md:p-3 shadow-2xl shadow-brand-900/5 ring-1 ring-white/10">
+               <div className="bg-slate-900/50 rounded-2xl border border-slate-700/50 overflow-hidden">
+                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-700/50">
+                    <div className="p-8 md:p-12 hover:bg-slate-800/40 transition-colors duration-500">
                       <FileUpload 
                         label="Manuscript" 
                         subLabel="Paste or upload .tex content" 
@@ -179,7 +179,7 @@ function App() {
                         accept=".tex,.txt,.md"
                       />
                     </div>
-                    <div className="p-8 md:p-12 hover:bg-white/40 transition-colors duration-500">
+                    <div className="p-8 md:p-12 hover:bg-slate-800/40 transition-colors duration-500">
                       <FileUpload 
                         label="Bibliography" 
                         subLabel="Paste or upload .bib content" 
@@ -191,9 +191,9 @@ function App() {
                     </div>
                  </div>
                  
-                 <div className="bg-white/40 backdrop-blur-sm p-8 flex flex-col items-center border-t border-slate-200/50">
+                 <div className="bg-slate-900/40 backdrop-blur-sm p-8 flex flex-col items-center border-t border-slate-700/50">
                     {errorMsg && (
-                      <div className="mb-6 px-4 py-3 bg-red-50/90 border border-red-200 rounded-xl text-red-700 flex items-center gap-3 text-sm font-medium animate-shake shadow-sm">
+                      <div className="mb-6 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 flex items-center gap-3 text-sm font-medium animate-shake shadow-sm">
                         <Icons.Warning className="w-5 h-5 flex-shrink-0" />
                         {errorMsg}
                       </div>
@@ -206,8 +206,8 @@ function App() {
                         group relative inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white transition-all duration-300 
                         rounded-2xl shadow-xl shadow-brand-500/30 focus:outline-none focus:ring-4 focus:ring-brand-500/20 active:scale-95
                         ${(!manuscriptText || !bibliographyText) 
-                          ? 'bg-slate-300 cursor-not-allowed shadow-none opacity-70' 
-                          : 'bg-slate-800 hover:bg-slate-700 hover:shadow-brand-600/40 hover:-translate-y-1'
+                          ? 'bg-slate-800 cursor-not-allowed shadow-none opacity-50' 
+                          : 'bg-brand-600 hover:bg-brand-500 hover:shadow-brand-600/40 hover:-translate-y-1'
                         }
                       `}
                     >
@@ -221,15 +221,15 @@ function App() {
             {/* Features Footer */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 opacity-80">
                {[
-                 { icon: Icons.Activity, color: 'text-blue-600', bg: 'bg-blue-50', title: 'Contextual Analysis', desc: 'Evaluates how you use citations, not just that they exist.' },
-                 { icon: Icons.Chart, color: 'text-purple-600', bg: 'bg-purple-50', title: 'Visual Metrics', desc: 'Get a 5-dimensional score for every reference in your paper.' },
-                 { icon: Icons.Warning, color: 'text-amber-600', bg: 'bg-amber-50', title: 'Gap Detection', desc: 'Identifies unsupported claims and outdated sources.' }
+                 { icon: Icons.Activity, color: 'text-brand-400', bg: 'bg-brand-500/10', title: 'Contextual Analysis', desc: 'Evaluates how you use citations, not just that they exist.' },
+                 { icon: Icons.Chart, color: 'text-slate-200', bg: 'bg-slate-700/50', title: 'Visual Metrics', desc: 'Get a 5-dimensional score for every reference in your paper.' },
+                 { icon: Icons.Warning, color: 'text-red-400', bg: 'bg-red-500/10', title: 'Gap Detection', desc: 'Identifies unsupported claims and outdated sources.' }
                ].map((feature, i) => (
                  <div key={i} className="flex flex-col items-center text-center gap-4 group cursor-default">
                    <div className={`p-4 ${feature.bg} ${feature.color} rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                      <feature.icon className="w-6 h-6" />
                    </div>
-                   <h3 className="font-display font-bold text-lg text-slate-900 group-hover:text-brand-600 transition-colors">{feature.title}</h3>
+                   <h3 className="font-display font-bold text-lg text-slate-100 group-hover:text-brand-400 transition-colors">{feature.title}</h3>
                    <p className="text-sm text-slate-500 leading-relaxed max-w-xs">{feature.desc}</p>
                  </div>
                ))}

@@ -9,7 +9,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-brand-500/30 selection:text-brand-100 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed w-full z-50 glass border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
+      <nav className="fixed w-full z-50 glass border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
@@ -38,7 +38,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-brand-400 text-xs font-semibold uppercase tracking-wider mb-8 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-brand-400 text-xs font-semibold uppercase tracking-wider mb-8 animate-fade-in">
             <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
             New Generation Reference Analysis
           </div>
@@ -61,7 +61,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             </button>
             <a 
               href="#features"
-              className="w-full sm:w-auto px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-lg rounded-xl border border-slate-700 transition-all duration-300 hover:border-brand-500/50"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 font-semibold text-lg rounded-xl border border-slate-700 transition-all duration-300 hover:border-brand-500/50"
             >
               Explore Features
             </a>
@@ -109,8 +109,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <div className="relative bg-slate-900 border border-slate-700 rounded-2xl p-8 shadow-2xl">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                        <div className="w-12 h-12 bg-green-900/30 rounded-full flex items-center justify-center border border-green-500/20">
-                            <span className="text-green-500 font-bold">98</span>
+                        <div className="w-12 h-12 bg-slate-700/50 rounded-full flex items-center justify-center border border-slate-600/30">
+                            <span className="text-brand-400 font-bold">98</span>
                         </div>
                         <div>
                             <h4 className="font-semibold text-slate-200">Alignment Score</h4>

@@ -27,9 +27,9 @@ export const ScatterPlot: React.FC<ScatterPlotProps> = ({ references }) => {
   // Recent (>2023) = Green
   // Low Relevance = Grey
   const getColor = (entry: any) => {
-    if (entry.year >= new Date().getFullYear() - 2) return '#3A523D'; // Dark Green (Recent)
+    if (entry.year >= new Date().getFullYear() - 2) return '#EDE0C0'; // Cream (Recent)
     if (entry.relevance > 80 && entry.authority > 50) return '#DB9E5C'; // Gold (High Value)
-    if (entry.relevance < 40) return '#94a3b8'; // Grey (Low Relevance)
+    if (entry.relevance < 40) return '#64748b'; // Slate-500 (Low Relevance)
     return '#D00000'; // Red (Standard)
   };
 
@@ -40,7 +40,7 @@ export const ScatterPlot: React.FC<ScatterPlotProps> = ({ references }) => {
         <p className="text-sm text-slate-400">
           Time vs. Impact scatter plot. 
           <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#DB9E5C]"></span> High Impact
-          <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#3A523D]"></span> Recent
+          <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#EDE0C0]"></span> Recent
           <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#D00000]"></span> Standard
         </p>
       </div>

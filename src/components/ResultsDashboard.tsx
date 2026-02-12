@@ -125,11 +125,11 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
               </div>
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100/10 text-sm font-semibold backdrop-blur-md border border-slate-100/10 shadow-lg">
                 {result.overallScore >= 40 ? (
-                  <><Icons.Success className="w-4 h-4 text-green-400" /> Excellent Quality</>
+                  <><Icons.Success className="w-4 h-4 text-brand-400" /> Excellent Quality</>
                 ) : result.overallScore >= 25 ? (
-                  <><Icons.Warning className="w-4 h-4 text-blue-400" /> Good Quality</>
+                  <><Icons.Warning className="w-4 h-4 text-slate-200" /> Good Quality</>
                 ) : result.overallScore >= 18 ? (
-                  <><Icons.Warning className="w-4 h-4 text-amber-400" /> Moderate Quality</>
+                  <><Icons.Warning className="w-4 h-4 text-slate-400" /> Moderate Quality</>
                 ) : (
                   <><Icons.Warning className="w-4 h-4 text-red-400" /> Needs Improvement</>
                 )}
@@ -144,11 +144,11 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
         {/* Stats Cards */}
         <div className="glass-card rounded-3xl p-6 flex flex-col justify-between hover:border-brand-500/30 group">
           <div className="flex items-start justify-between">
-            <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl group-hover:scale-110 transition-transform duration-300 border border-blue-500/20">
+            <div className="p-3 bg-brand-500/10 text-brand-400 rounded-2xl group-hover:scale-110 transition-transform duration-300 border border-brand-500/20">
               <Icons.Bibliography className="w-6 h-6" />
             </div>
             {validReferences.length > 20 && (
-              <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded-full border border-green-500/20 uppercase tracking-wide">High Volume</span>
+              <span className="text-[10px] font-bold text-slate-200 bg-slate-700/50 px-2 py-1 rounded-full border border-slate-600/50 uppercase tracking-wide">High Volume</span>
             )}
           </div>
           <div>
@@ -157,12 +157,12 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
           </div>
         </div>
 
-        <div className="glass-card rounded-3xl p-6 flex flex-col justify-between hover:border-amber-500/30 group">
+        <div className="glass-card rounded-3xl p-6 flex flex-col justify-between hover:border-brand-500/30 group">
           <div className="flex items-start justify-between">
-            <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl group-hover:scale-110 transition-transform duration-300 border border-amber-500/20">
+            <div className="p-3 bg-slate-700/50 text-slate-200 rounded-2xl group-hover:scale-110 transition-transform duration-300 border border-slate-600/50">
               <Icons.Clock className="w-6 h-6" />
             </div>
-            <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20 uppercase tracking-wide">Avg Age</span>
+            <span className="text-[10px] font-bold text-brand-400 bg-brand-500/10 px-2 py-1 rounded-full border border-brand-500/20 uppercase tracking-wide">Avg Age</span>
           </div>
           <div>
             <div className="text-4xl font-display font-bold text-white mt-4">
@@ -193,9 +193,9 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                   <Icons.Info className="w-3.5 h-3.5 text-slate-600 group-hover:text-brand-400 transition-colors" />
                 </h4>
                 <div className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
-                  score >= 40 ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
-                  score >= 25 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 
-                  score >= 18 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                  score >= 40 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' : 
+                  score >= 25 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' : 
+                  score >= 18 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
                   'bg-red-500/10 text-red-400 border-red-500/20'
                 }`}>
                   {score.toFixed(2)}/100
@@ -204,9 +204,9 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
               <div className="w-full bg-slate-700/50 rounded-full h-2 mb-2 overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-1000 ${
-                    score >= 40 ? 'bg-green-500' : 
-                    score >= 25 ? 'bg-blue-500' : 
-                    score >= 18 ? 'bg-amber-500' :
+                    score >= 40 ? 'bg-brand-500' : 
+                    score >= 25 ? 'bg-slate-200' : 
+                    score >= 18 ? 'bg-slate-600' :
                     'bg-red-500'
                   }`}
                   style={{ width: `${score}%` }}
@@ -292,18 +292,18 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className={`inline-flex items-center justify-center font-bold text-sm ${
-                           avgScore >= 40 ? 'text-green-400' :
-                           avgScore >= 25 ? 'text-blue-400' :
-                           avgScore >= 18 ? 'text-amber-400' : 'text-red-400'
+                           avgScore >= 40 ? 'text-brand-400' :
+                           avgScore >= 25 ? 'text-slate-200' :
+                           avgScore >= 18 ? 'text-slate-400' : 'text-red-400'
                         }`}>
                           {avgScore.toFixed(2)}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
-                           avgScore >= 40 ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                           avgScore >= 25 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                           avgScore >= 18 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                           avgScore >= 40 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' :
+                           avgScore >= 25 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' :
+                           avgScore >= 18 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
                            'bg-red-500/10 text-red-400 border-red-500/20'
                          }`}>
                            {avgScore >= 40 ? 'Good' : avgScore >= 25 ? 'OK' : avgScore >= 18 ? 'Medium' : 'Bad'}
@@ -342,19 +342,19 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
           {/* Critical Gaps */}
           <div className="glass-card rounded-3xl p-6 border border-white/5">
             <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-              <Icons.Warning className="w-5 h-5 text-amber-400" />
+              <Icons.Warning className="w-5 h-5 text-red-400" />
               Detected Gaps
             </h3>
             
             {result.gaps.length === 0 ? (
-               <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20 text-center">
-                 <p className="text-sm text-green-400 font-bold">No critical argumentation gaps detected.</p>
+               <div className="p-4 bg-brand-500/10 rounded-xl border border-brand-500/20 text-center">
+                 <p className="text-sm text-brand-400 font-bold">No critical argumentation gaps detected.</p>
                </div>
              ) : (
                <div className="space-y-3">
                  {result.gaps.map((gap, i) => (
-                   <div key={i} className="flex gap-3 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors cursor-default">
-                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold mt-0.5 border border-amber-500/20">
+                   <div key={i} className="flex gap-3 p-4 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 transition-colors cursor-default">
+                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-[10px] font-bold mt-0.5 border border-red-500/20">
                        {i + 1}
                      </span>
                      <p className="text-sm text-slate-300 leading-snug">{gap}</p>
@@ -390,7 +390,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
           {result.analyzedSentences.some(s => s.suggestedReferences && s.suggestedReferences.length > 0) && (
             <div className="glass-card rounded-3xl p-6 border border-white/5 animate-fade-in-up">
               <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                <Icons.Lightbulb className="w-5 h-5 text-yellow-400" />
+                <Icons.Lightbulb className="w-5 h-5 text-brand-400" />
                 Smart Suggestions
               </h3>
               <div className="space-y-4">

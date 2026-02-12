@@ -97,7 +97,7 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
             <p className="text-slate-400 text-sm font-medium mb-1">Valid References</p>
             <h3 className="text-3xl font-display font-bold text-white">{validReferences.length}</h3>
           </div>
-          <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400">
+          <div className="p-3 bg-slate-700/50 rounded-xl text-slate-200">
             <Icons.Bibliography className="w-6 h-6" />
           </div>
         </div>
@@ -106,13 +106,13 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
           <div>
             <p className="text-slate-400 text-sm font-medium mb-1">Average RefScore</p>
             <h3 className={`text-3xl font-display font-bold ${
-                avgScore >= 40 ? 'text-green-400' : avgScore >= 25 ? 'text-blue-400' : avgScore >= 18 ? 'text-amber-400' : 'text-red-400'
+                avgScore >= 40 ? 'text-brand-400' : avgScore >= 25 ? 'text-slate-200' : avgScore >= 18 ? 'text-slate-400' : 'text-red-400'
             }`}>
               {avgScore.toFixed(1)}
             </h3>
           </div>
           <div className={`p-3 rounded-xl ${
-              avgScore >= 40 ? 'bg-green-500/10 text-green-400' : avgScore >= 25 ? 'bg-blue-500/10 text-blue-400' : avgScore >= 18 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'
+              avgScore >= 40 ? 'bg-brand-500/10 text-brand-400' : avgScore >= 25 ? 'bg-slate-500/10 text-slate-200' : avgScore >= 18 ? 'bg-slate-700/30 text-slate-400' : 'bg-red-500/10 text-red-400'
           }`}>
             <Icons.Chart className="w-6 h-6" />
           </div>
@@ -125,7 +125,7 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
               {validReferences.filter(r => r.year >= new Date().getFullYear() - 5).length}
             </h3>
           </div>
-          <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400">
+          <div className="p-3 bg-brand-500/10 rounded-xl text-brand-400">
             <Icons.Recency className="w-6 h-6" />
           </div>
         </div>
@@ -191,9 +191,9 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
                             {/* Score Badge */}
                             <div className="flex-shrink-0">
                                 <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center border ${
-                                    score >= 40 ? 'bg-green-500/10 border-green-500/20 text-green-400' : 
-                                    score >= 25 ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                                    score >= 18 ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 
+                                    score >= 40 ? 'bg-brand-500/10 border-brand-500/20 text-brand-400' : 
+                                    score >= 25 ? 'bg-slate-500/10 border-slate-500/20 text-slate-200' :
+                                    score >= 18 ? 'bg-slate-700/30 border-slate-700/50 text-slate-400' : 
                                     'bg-red-500/10 border-red-500/20 text-red-400'
                                 }`}>
                                     <span className="text-xl font-bold">{score.toFixed(0)}</span>

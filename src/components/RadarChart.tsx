@@ -28,28 +28,28 @@ export const ScoreRadar: React.FC<ScoreRadarProps> = ({ data }) => {
           <PolarGrid stroke="rgba(255,255,255,0.1)" strokeDasharray="3 3" />
           <PolarAngleAxis 
             dataKey="subject" 
-            tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700, fontFamily: 'Inter, sans-serif' }} 
+            tick={{ fill: '#EDE0C0', fontSize: 10, fontWeight: 700, fontFamily: 'Inter, sans-serif' }} 
           />
           <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
           <Radar
             name="RefScore"
             dataKey="A"
-            stroke="#4361ee"
+            stroke="#DB9E5C"
             strokeWidth={3}
-            fill="#4361ee"
+            fill="#DB9E5C"
             fillOpacity={0.25}
             isAnimationActive={true}
           />
           <Tooltip 
             contentStyle={{ 
-              backgroundColor: 'rgba(15, 23, 42, 0.95)', // slate-950
+              backgroundColor: '#000000', 
               borderRadius: '12px', 
-              border: '1px solid rgba(255, 255, 255, 0.1)', 
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
-              color: '#f8fafc' // slate-50
+              border: '1px solid rgba(58, 82, 61, 0.5)', 
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+              color: '#EDE0C0' 
             }}
-            itemStyle={{ color: '#60a5fa', fontWeight: 'bold', fontFamily: 'Outfit, sans-serif' }} // blue-400
-            cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1 }}
+            itemStyle={{ color: '#DB9E5C', fontWeight: 'bold', fontFamily: 'Outfit, sans-serif' }} 
+            cursor={{ stroke: 'rgba(237, 224, 192, 0.2)', strokeWidth: 1 }}
           />
         </RadarChart>
       </ResponsiveContainer>
