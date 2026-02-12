@@ -10,114 +10,95 @@ export const generatePDF = async (elementId: string, title: string = 'RefScore A
 
   try {
     const canvas = await html2canvas(element, {
-      scale: 2, // Improve quality
+      scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: '#0f172a', // Match the slate-900 background
+      backgroundColor: '#0f172a',
       onclone: (doc) => {
         const root = doc.getElementById(elementId) as HTMLElement | null;
         if (!root || !doc.defaultView) return;
         const win = doc.defaultView;
-        
-        // 1. Sanitize all <style> tags in the clone to prevent html2canvas crash on oklch/oklab/color-mix
-        const styleTags = doc.getElementsByTagName('style');
-        for (let i = 0; i < styleTags.length; i++) {
-          const style = styleTags[i];
-          if (style.textContent) {
-            // Replace modern color functions with a safe fallback
-            style.textContent = style.textContent
-              .replace(/oklch\([^)]*\)/g, 'rgb(0,0,0)')
-              .replace(/oklab\([^)]*\)/g, 'rgb(0,0,0)')
-              .replace(/color-mix\([^)]*\)/g, 'rgb(0,0,0)');
-          }
-        }
 
-        // Helper to normalize colors to RGB/Hex using a shared canvas context
-        const canvas = doc.createElement('canvas');
-        canvas.width = 1;
-        canvas.height = 1;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        
-        const formatColor = (color: string): string => {
-           if (!color || color === 'transparent' || color === 'inherit') return color;
-           if (color.startsWith('rgb') || color.startsWith('#') || color.startsWith('hsl')) return color;
-           
-           if (ctx) {
-             try {
-               ctx.fillStyle = color;
-               return ctx.fillStyle; 
-             } catch (e) {
-               return color;
-             }
-           }
-           return color;
+        // 1. Setup color normalization canvas
+        const colorCanvas = doc.createElement('canvas');
+        colorCanvas.width = 1;
+        colorCanvas.height = 1;
+        const ctx = colorCanvas.getContext('2d', { medicalUsage: false } as any);
+
+        const formatToRGB = (color: string): string => {
+          if (!color || ['transparent', 'inherit', 'initial', 'unset'].includes(color)) return color;
+          // If already a standard format, return as is
+          if (color.startsWith('rgb') || color.startsWith('#') || color.startsWith('hsl')) return color;
+          
+          if (ctx) {
+            try {
+              // The browser's canvas engine will convert oklch/oklab to RGB automatically
+              (ctx as CanvasRenderingContext2D).fillStyle = color;
+              const normalized = (ctx as CanvasRenderingContext2D).fillStyle;
+              // If the result is the same string and it's not a hex/rgb, it failed to parse
+              if (normalized === color && !color.startsWith('#') && !color.startsWith('rgb')) {
+                return 'rgb(0,0,0)'; // Fallback for truly unparseable modern functions
+              }
+              return normalized as string;
+            } catch (e) {
+              return 'rgb(0,0,0)';
+            }
+          }
+          return color;
         };
 
-        // Fix Recharts sizing by applying fixed dimensions from the original element if possible
+        // 2. Fix Recharts Responsive Containers
         const containers = root.querySelectorAll('.recharts-responsive-container');
         containers.forEach((container) => {
-           const el = container as HTMLElement;
-           if (!el.style.width && !el.style.height) {
-              el.style.width = '100%';
-              el.style.height = '100%';
-           }
-           el.style.display = 'block';
-           el.style.overflow = 'visible';
+          const el = container as HTMLElement;
+          el.style.width = el.offsetWidth + 'px';
+          el.style.height = el.offsetHeight + 'px';
+          el.style.display = 'block';
+          el.style.visibility = 'visible';
         });
 
+        // 3. Recursively inline all styles and sanitize colors
         const stack: HTMLElement[] = [root];
+        const colorProps = [
+          'color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 
+          'borderBottomColor', 'borderLeftColor', 'outlineColor', 
+          'fill', 'stroke', 'stopColor', 'floodColor'
+        ] as const;
+
         while (stack.length) {
           const el = stack.pop()!;
           const cs = win.getComputedStyle(el);
           
-          // Inline standard color properties
-          const colorProps = [
-            'color',
-            'backgroundColor',
-            'borderTopColor',
-            'borderRightColor',
-            'borderBottomColor',
-            'borderLeftColor',
-            'outlineColor',
-            'textDecorationColor',
-            'columnRuleColor',
-            'fill',
-            'stroke',
-            'stopColor',
-            'floodColor',
-            'lightingColor'
-          ] as const;
-          
+          // Inline standard colors
           for (const prop of colorProps) {
             const val = (cs as any)[prop];
             if (val) {
-              (el.style as any)[prop] = formatColor(val);
+              (el.style as any)[prop] = formatToRGB(val);
             }
           }
 
-          // Handle background-image (gradients) which may contain oklch/oklab
-          const bgImage = cs.backgroundImage;
-          if (bgImage && (bgImage.includes('okl') || bgImage.includes('lab(') || bgImage.includes('color-mix'))) {
-             // If gradient contains unsupported colors, simplify it to a solid background
-             // or just strip the gradient to avoid crash
-             el.style.backgroundImage = 'none';
+          // Strip problematic shadows and gradients
+          const complexProps = ['boxShadow', 'textShadow', 'backgroundImage'] as const;
+          for (const prop of complexProps) {
+            const val = (cs as any)[prop];
+            if (val && (val.includes('okl') || val.includes('lab(') || val.includes('color-mix'))) {
+              (el.style as any)[prop] = 'none';
+            }
           }
 
-          // Handle Shadows separately (sanitize oklab/oklch)
-          const shadowProps = ['boxShadow', 'textShadow'] as const;
-          for (const prop of shadowProps) {
-             const val = (cs as any)[prop];
-             if (val && (val.includes('okl') || val.includes('lab(') || val.includes('color-mix'))) {
-                (el.style as any)[prop] = 'none';
-             }
-          }
+          // Ensure visibility
+          el.style.opacity = '1';
 
-          const children = el.children;
-          for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            if (child.nodeType === 1) stack.push(child as HTMLElement);
-          }
+          Array.from(el.children).forEach(child => {
+            if (child instanceof HTMLElement) stack.push(child);
+          });
         }
+
+        // 4. CRITICAL: Remove all stylesheets to prevent html2canvas parser crash
+        // Since we've inlined the styles we need on the elements themselves, 
+        // we can safely remove the global CSS.
+        const styles = doc.querySelectorAll('style, link[rel="stylesheet"]');
+        styles.forEach(s => s.remove());
       }
     });
 
@@ -128,20 +109,19 @@ export const generatePDF = async (elementId: string, title: string = 'RefScore A
       format: 'a4'
     });
 
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 297; // A4 height in mm
+    const imgWidth = 210;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
     let position = 0;
 
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    heightLeft -= 297;
 
     while (heightLeft >= 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      heightLeft -= 297;
     }
 
     pdf.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
