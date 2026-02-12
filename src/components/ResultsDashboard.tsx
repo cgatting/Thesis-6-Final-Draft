@@ -124,18 +124,18 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                 <span className="text-3xl text-slate-400 font-normal ml-1">/100</span>
               </div>
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100/10 text-sm font-semibold backdrop-blur-md border border-slate-100/10 shadow-lg">
-                {result.overallScore >= 40 ? (
-                  <><Icons.Success className="w-4 h-4 text-brand-400" /> Excellent Quality</>
-                ) : result.overallScore >= 25 ? (
-                  <><Icons.Warning className="w-4 h-4 text-slate-200" /> Good Quality</>
-                ) : result.overallScore >= 18 ? (
-                  <><Icons.Warning className="w-4 h-4 text-slate-400" /> Moderate Quality</>
+                {result.overallScore >= 70 ? (
+                  <><Icons.Success className="w-4 h-4 text-brand-400" /> Excellent</>
+                ) : result.overallScore >= 50 ? (
+                  <><Icons.Warning className="w-4 h-4 text-slate-200" /> Good</>
+                ) : result.overallScore >= 30 ? (
+                  <><Icons.Warning className="w-4 h-4 text-slate-400" /> Ok</>
                 ) : (
-                  <><Icons.Warning className="w-4 h-4 text-red-400" /> Needs Improvement</>
+                  <><Icons.Warning className="w-4 h-4 text-red-400" /> Bad</>
                 )}
               </div>
             </div>
-            <div className="w-32 h-32 md:w-40 md:h-40 opacity-90 drop-shadow-2xl">
+            <div className="w-40 h-40 md:w-52 md:h-52 opacity-90 drop-shadow-2xl">
                <ScoreRadar data={result.dimensionScores} />
             </div>
           </div>
@@ -193,9 +193,9 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                   <Icons.Info className="w-3.5 h-3.5 text-slate-600 group-hover:text-brand-400 transition-colors" />
                 </h4>
                 <div className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
-                  score >= 40 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' : 
-                  score >= 25 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' : 
-                  score >= 18 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
+                  score >= 70 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' : 
+                  score >= 50 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' : 
+                  score >= 30 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
                   'bg-red-500/10 text-red-400 border-red-500/20'
                 }`}>
                   {score.toFixed(2)}/100
@@ -204,9 +204,9 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
               <div className="w-full bg-slate-700/50 rounded-full h-2 mb-2 overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-1000 ${
-                    score >= 40 ? 'bg-brand-500' : 
-                    score >= 25 ? 'bg-slate-200' : 
-                    score >= 18 ? 'bg-slate-600' :
+                    score >= 70 ? 'bg-brand-500' : 
+                    score >= 50 ? 'bg-slate-200' : 
+                    score >= 30 ? 'bg-slate-600' :
                     'bg-red-500'
                   }`}
                   style={{ width: `${score}%` }}
@@ -270,6 +270,9 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                   <th className="px-6 py-4 w-32 tracking-wider cursor-pointer hover:bg-slate-800/50 transition-colors select-none" onClick={() => handleSort('score')}>
                     <div className="flex items-center">Status <SortIcon field="score" /></div>
                   </th>
+                  <th className="px-6 py-4 w-24 tracking-wider cursor-pointer hover:bg-slate-800/50 transition-colors select-none">
+                    <div className="flex items-center">DOI</div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -292,23 +295,39 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className={`inline-flex items-center justify-center font-bold text-sm ${
-                           avgScore >= 40 ? 'text-brand-400' :
-                           avgScore >= 25 ? 'text-slate-200' :
-                           avgScore >= 18 ? 'text-slate-400' : 'text-red-400'
+                           avgScore >= 70 ? 'text-brand-400' :
+                           avgScore >= 50 ? 'text-slate-200' :
+                           avgScore >= 30 ? 'text-slate-400' : 'text-red-400'
                         }`}>
                           {avgScore.toFixed(2)}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
-                           avgScore >= 40 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' :
-                           avgScore >= 25 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' :
-                           avgScore >= 18 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
+                           avgScore >= 70 ? 'bg-brand-500/10 text-brand-400 border-brand-500/20' :
+                           avgScore >= 50 ? 'bg-slate-500/10 text-slate-200 border-slate-500/20' :
+                           avgScore >= 30 ? 'bg-slate-700/30 text-slate-400 border-slate-700/50' :
                            'bg-red-500/10 text-red-400 border-red-500/20'
                          }`}>
-                           {avgScore >= 40 ? 'Good' : avgScore >= 25 ? 'OK' : avgScore >= 18 ? 'Medium' : 'Bad'}
+                           {avgScore >= 70 ? 'Excellent' : avgScore >= 50 ? 'Good' : avgScore >= 30 ? 'Ok' : 'Bad'}
                          </span>
                       </td>
+                      <td className="px-6 py-4">
+                         {ref.doi ? (
+                           <button 
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               window.open(`https://doi.org/${ref.doi}`, '_blank', 'noopener,noreferrer');
+                             }}
+                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-bold rounded-lg border border-brand-500/20 transition-all hover:shadow-lg hover:shadow-brand-500/10 group/btn cursor-pointer"
+                           >
+                             Open
+                             <Icons.ExternalLink className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />
+                           </button>
+                         ) : (
+                           <span className="text-slate-600 text-xs font-medium px-3 py-1.5">—</span>
+                         )}
+                       </td>
                     </tr>
                   );
                 })}
@@ -372,7 +391,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
             </h3>
             <ul className="space-y-3">
               {[
-                `Review references flagged as "Weak" for potential replacement.`,
+                `Review references flagged as "Bad" for potential replacement.`,
                 `Address the ${result.gaps.length} detected argumentation gaps.`,
                 `Ensure high-impact claims have recent citations (last 5 years).`
               ].map((step, i) => (

@@ -111,14 +111,36 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         )}
         
-        <textarea
-          className="w-full h-full p-5 resize-none text-sm text-slate-300 leading-relaxed focus:outline-none font-mono bg-transparent relative z-10 placeholder:text-slate-600"
-          placeholder={isFocused ? "Paste content here..." : ""}
-          value={value}
-          onChange={handlePaste}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
+        {value ? (
+           <div className="absolute inset-0 flex items-center justify-center p-6 animate-fade-in">
+              <div className="text-center">
+                  <div className="w-16 h-16 mx-auto bg-brand-500/10 rounded-full flex items-center justify-center mb-4 text-brand-400 border border-brand-500/20 shadow-lg shadow-brand-500/10">
+                      <Icons.Success className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-slate-100 font-display font-bold text-lg mb-2">
+                      {fileName ? 'File Uploaded Successfully' : 'Content Added Successfully'}
+                  </h3>
+                  <p className="text-slate-400 text-sm font-medium max-w-[250px] mx-auto truncate mb-6">
+                      {fileName || `${value.length.toLocaleString()} characters`}
+                  </p>
+                  <button 
+                     onClick={(e) => { e.stopPropagation(); setFileName(null); onChange(''); }}
+                     className="text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 px-4 py-2 rounded-lg transition-all duration-200"
+                  >
+                    Remove & Replace
+                  </button>
+              </div>
+           </div>
+        ) : (
+            <textarea
+              className="w-full h-full p-5 resize-none text-sm text-slate-300 leading-relaxed focus:outline-none font-mono bg-transparent relative z-10 placeholder:text-slate-600"
+              placeholder={isFocused ? "Paste content here..." : ""}
+              value={value}
+              onChange={handlePaste}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+        )}
         
         <input 
           type="file" 
@@ -127,22 +149,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           accept={accept}
           onChange={handleFileChange}
         />
-        
-        {/* Success Indicator */}
-        {fileName && (
-          <div className="absolute bottom-4 right-4 bg-slate-950 text-white text-xs px-3 py-2 rounded-lg shadow-xl border border-white/10 flex items-center gap-2 animate-fade-in-up z-20">
-            <div className="bg-green-500 rounded-full p-0.5">
-              <Icons.Success className="w-3 h-3 text-white" />
-            </div>
-            <span className="font-medium max-w-[150px] truncate">{fileName}</span>
-            <button 
-               onClick={(e) => { e.stopPropagation(); setFileName(null); onChange(''); }}
-               className="ml-2 text-slate-400 hover:text-white transition-colors"
-            >
-              ×
-            </button>
-          </div>
-        )}
       </div>
       
       {/* Visual Corner Accent */}

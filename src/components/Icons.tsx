@@ -20,7 +20,8 @@ import {
   Lightbulb,
   RefreshCw,
   Check,
-  Link
+  Link,
+  ExternalLink
 } from 'lucide-react';
 
 // Icons mapping
@@ -51,5 +52,6 @@ export const Icons = {
   Lightbulb: Lightbulb,
   RefreshCw: RefreshCw,
   Check: Check,
-  Link: Link
+  Link: Link,
+  ExternalLink: ExternalLink
 };

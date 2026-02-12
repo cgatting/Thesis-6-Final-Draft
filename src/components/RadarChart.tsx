@@ -24,11 +24,11 @@ export const ScoreRadar: React.FC<ScoreRadarProps> = ({ data }) => {
   return (
     <div className="w-full h-full min-h-[100px]">
       <ResponsiveContainer width="100%" height="100%" minHeight={100}>
-        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+        <RadarChart cx="50%" cy="50%" outerRadius="50%" data={chartData}>
           <PolarGrid stroke="rgba(255,255,255,0.1)" strokeDasharray="3 3" />
           <PolarAngleAxis 
             dataKey="subject" 
-            tick={{ fill: '#EDE0C0', fontSize: 10, fontWeight: 700, fontFamily: 'Inter, sans-serif' }} 
+            tick={{ fill: '#EDE0C0', fontSize: 12, fontWeight: 700, fontFamily: 'Inter, sans-serif' }} 
           />
           <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
           <Radar

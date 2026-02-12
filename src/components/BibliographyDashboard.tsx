@@ -191,9 +191,9 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
                             {/* Score Badge */}
                             <div className="flex-shrink-0">
                                 <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center border ${
-                                    score >= 40 ? 'bg-brand-500/10 border-brand-500/20 text-brand-400' : 
-                                    score >= 25 ? 'bg-slate-500/10 border-slate-500/20 text-slate-200' :
-                                    score >= 18 ? 'bg-slate-700/30 border-slate-700/50 text-slate-400' : 
+                                    score >= 70 ? 'bg-brand-500/10 border-brand-500/20 text-brand-400' : 
+                                    score >= 50 ? 'bg-slate-500/10 border-slate-500/20 text-slate-200' :
+                                    score >= 30 ? 'bg-slate-700/30 border-slate-700/50 text-slate-400' : 
                                     'bg-red-500/10 border-red-500/20 text-red-400'
                                 }`}>
                                     <span className="text-xl font-bold">{score.toFixed(0)}</span>

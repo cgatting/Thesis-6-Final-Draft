@@ -31,7 +31,9 @@ export class ScoringEngine {
     let alignmentScore = 0;
     if (sentence.embedding && reference.embedding) {
         const rawSim = cosineSimilarity(sentence.embedding, reference.embedding);
-        alignmentScore = Math.max(0, rawSim * 100);
+        // Boost score: raw cosine similarity is often low for short sentences vs abstracts.
+        // Using sqrt(sim) * 100 curves the score to be more intuitive (0.25 -> 50, 0.5 -> 70)
+        alignmentScore = Math.min(100, Math.sqrt(Math.max(0, rawSim)) * 100);
     }
 
     // 2. Numbers

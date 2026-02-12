@@ -56,9 +56,9 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 40) return 'text-brand-400 bg-brand-500/10 border-brand-500/20 hover:bg-brand-500/20 ring-brand-500/30';
-    if (score >= 25) return 'text-slate-200 bg-slate-500/10 border-slate-500/20 hover:bg-slate-500/20 ring-slate-500/30';
-    if (score >= 18) return 'text-slate-400 bg-slate-700/30 border-slate-700/50 hover:bg-slate-700/40 ring-slate-700/30';
+    if (score >= 70) return 'text-brand-400 bg-brand-500/10 border-brand-500/20 hover:bg-brand-500/20 ring-brand-500/30';
+    if (score >= 50) return 'text-slate-200 bg-slate-500/10 border-slate-500/20 hover:bg-slate-500/20 ring-slate-500/30';
+    if (score >= 30) return 'text-slate-400 bg-slate-700/30 border-slate-700/50 hover:bg-slate-700/40 ring-slate-700/30';
     return 'text-red-400 bg-red-500/10 border-red-500/20 hover:bg-red-500/20 ring-red-500/30';
   };
 
