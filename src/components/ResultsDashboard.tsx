@@ -3,19 +3,24 @@ import { AnalysisResult, ProcessedReference } from '../types';
 import { ScoreRadar } from './RadarChart';
 import { ScatterPlot } from './ScatterPlot';
 import { Icons } from './Icons';
-import { computeWeightedTotal } from '../services/scoring/ScoringEngine';
+import { ScoringConfig, ScoringEngine } from '../services/scoring/ScoringEngine';
 import { generatePDF } from '../utils/pdfGenerator';
 
 interface ResultsDashboardProps {
   result: AnalysisResult;
   onReset: () => void;
+  scoringConfig: ScoringConfig;
 }
 
-export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onReset }) => {
+export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onReset, scoringConfig }) => {
   const [filter, setFilter] = useState('');
   const [sortField, setSortField] = useState<'id' | 'title' | 'year' | 'score'>('id');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [isExporting, setIsExporting] = useState(false);
+
+  const computeScore = (scores: any) => {
+    return new ScoringEngine(scoringConfig).computeWeightedTotal(scores);
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -46,8 +51,8 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
       case 'year':
         return multiplier * ((a.year || 0) - (b.year || 0));
       case 'score':
-        const scoreA = a.scores ? computeWeightedTotal(a.scores) : 0;
-        const scoreB = b.scores ? computeWeightedTotal(b.scores) : 0;
+        const scoreA = a.scores ? computeScore(a.scores) : 0;
+        const scoreB = b.scores ? computeScore(b.scores) : 0;
         return multiplier * (scoreA - scoreB);
       default:
         return 0;
@@ -278,7 +283,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
               <tbody className="divide-y divide-white/5">
                 {sortedRefs.map((ref) => {
                   const avgScore = ref.scores 
-                    ? computeWeightedTotal(ref.scores) 
+                    ? computeScore(ref.scores) 
                     : 0;
                     
                   return (

@@ -9,7 +9,11 @@ export class CitationFinderService {
   private oaService = new OpenAlexService();
   private vectorizer = new TfIdfVectorizer();
   private entityExtractor = new EntityExtractor();
-  private scoringEngine = new ScoringEngine();
+  private scoringEngine: ScoringEngine;
+
+  constructor(config?: any) {
+    this.scoringEngine = new ScoringEngine(config);
+  }
 
   /**
    * Queries OpenAlex for better alternative sources.
@@ -95,7 +99,7 @@ export class CitationFinderService {
       
       return {
         candidate,
-        totalScore: computeWeightedTotal(scores)
+        totalScore: this.scoringEngine.computeWeightedTotal(scores)
       };
     });
 

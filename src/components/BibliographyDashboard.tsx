@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AnalysisResult, ProcessedReference } from '../types';
 import { Icons } from './Icons';
-import { computeWeightedTotal } from '../services/scoring/ScoringEngine';
+import { ScoringConfig, ScoringEngine } from '../services/scoring/ScoringEngine';
 import {
   extractBibFileNameFromTex,
   sortBibTexEntriesAlphabetically,
@@ -16,6 +16,7 @@ interface BibliographyDashboardProps {
   manuscriptText: string;
   bibliographyText: string;
   onUpdate: (newManuscript: string, newBib: string) => void;
+  scoringConfig: ScoringConfig;
 }
 
 export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
@@ -23,8 +24,13 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
   manuscriptText,
   bibliographyText,
   onUpdate,
+  scoringConfig,
 }) => {
   const [status, setStatus] = useState<string>('');
+
+  const computeScore = (scores: any) => {
+    return new ScoringEngine(scoringConfig).computeWeightedTotal(scores);
+  };
 
   // Instantiate parser
   const latexParser = useMemo(() => new LatexParser(), []);
@@ -38,16 +44,16 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
   const validReferences = useMemo(() => {
     return Object.values(result.references)
       .filter(ref => {
-        const score = ref.scores ? computeWeightedTotal(ref.scores) : 0;
+        const score = ref.scores ? computeScore(ref.scores) : 0;
         const isCited = citedKeys.has(ref.id);
         // User Requirement: Exclude score 0 and ensure they are cited
         return isCited && score > 0;
       })
       .sort((a, b) => a.id.localeCompare(b.id));
-  }, [result.references, citedKeys]);
+  }, [result.references, citedKeys, scoringConfig]);
 
   const avgScore = validReferences.length > 0
-    ? validReferences.reduce((acc, ref) => acc + (ref.scores ? computeWeightedTotal(ref.scores) : 0), 0) / validReferences.length
+    ? validReferences.reduce((acc, ref) => acc + (ref.scores ? computeScore(ref.scores) : 0), 0) / validReferences.length
     : 0;
 
   const bibFilename = useMemo(() => {
@@ -71,7 +77,7 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
     // We only care about removing citations for references that exist but have 0 score.
     const lowScoreKeys = Object.values(result.references)
         .filter(ref => {
-             const score = ref.scores ? computeWeightedTotal(ref.scores) : 0;
+             const score = ref.scores ? computeScore(ref.scores) : 0;
              return score === 0;
         })
         .map(ref => ref.id);
@@ -184,7 +190,7 @@ export const BibliographyDashboard: React.FC<BibliographyDashboardProps> = ({
                 </div>
             ) : (
                 validReferences.map((ref) => {
-                const score = ref.scores ? computeWeightedTotal(ref.scores) : 0;
+                const score = ref.scores ? computeScore(ref.scores) : 0;
                 return (
                     <div key={ref.id} className="p-6 hover:bg-slate-800/30 transition-colors group">
                         <div className="flex flex-col md:flex-row gap-6">

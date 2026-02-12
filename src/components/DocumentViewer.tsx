@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AnalysisResult, DimensionScores, ProcessedReference } from '../types';
 import { ScoreRadar } from './RadarChart';
-import { computeWeightedTotal } from '../services/scoring/ScoringEngine';
+import { ScoringConfig, ScoringEngine } from '../services/scoring/ScoringEngine';
 import { Icons } from './Icons';
 import { CitationFinderService } from '../services/CitationFinderService';
 
@@ -11,17 +11,24 @@ interface DocumentViewerProps {
   onUpdate: (newManuscript: string, newBib: string) => void;
   manuscriptText: string;
   bibliographyText: string;
+  scoringConfig: ScoringConfig;
 }
 
 // Matches \cite{}, \parencite{}, \textcite{} including arguments like [p. 1]
 const CITATION_SPLIT_REGEX = /(\\(?:cite|parencite|textcite|footcite)[a-zA-Z]*\*?(?:\[[^\]]*\])*\{[^}]+\})/;
 
-export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset, onUpdate, manuscriptText, bibliographyText }) => {
+export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset, onUpdate, manuscriptText, bibliographyText, scoringConfig }) => {
   const [findingSource, setFindingSource] = useState(false);
   const [betterSources, setBetterSources] = useState<ProcessedReference[]>([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'success'>('idle');
-  const [finderService] = useState(() => new CitationFinderService());
+  
+  // Re-create service when config changes
+  const finderService = React.useMemo(() => new CitationFinderService(scoringConfig), [scoringConfig]);
+
+  const computeScore = (scores: any) => {
+    return new ScoringEngine(scoringConfig).computeWeightedTotal(scores);
+  };
 
   const [activeAnalysis, setActiveAnalysis] = useState<{
     type: 'citation' | 'sentence';
@@ -136,7 +143,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                         <span key={pIdx} className="inline-flex flex-wrap gap-1.5 mx-1.5 align-baseline">
                           {keys.map((key) => {
                             const scores = sent.scores?.[key];
-                            const total = scores ? computeWeightedTotal(scores) : 0;
+                            const total = scores ? computeScore(scores) : 0;
                             const isActiveRef = activeAnalysis?.type === 'citation' && activeAnalysis.refId === key && activeAnalysis.sentenceIdx === sIdx;
                             
                             return (
@@ -209,10 +216,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                       </div>
                       <div className="flex items-baseline gap-1">
                         <span className={`text-4xl font-display font-bold tracking-tighter ${
-                          computeWeightedTotal(activeAnalysis.scores) >= 70 ? 'text-brand-400' : 
-                          computeWeightedTotal(activeAnalysis.scores) >= 50 ? 'text-slate-200' : 'text-red-400'
+                          computeScore(activeAnalysis.scores) >= 70 ? 'text-brand-400' : 
+                          computeScore(activeAnalysis.scores) >= 50 ? 'text-slate-200' : 'text-red-400'
                         }`}>
-                          {computeWeightedTotal(activeAnalysis.scores).toFixed(2)}
+                          {computeScore(activeAnalysis.scores).toFixed(2)}
                         </span>
                         <span className="text-sm text-slate-500 font-medium">/100</span>
                       </div>
@@ -250,6 +257,17 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                                  : result.references[activeAnalysis.refId].abstract)
                              : "No abstract available."}
                          </p>
+
+                         {result.references[activeAnalysis.refId]?.doi && (
+                            <a 
+                              href={`https://doi.org/${result.references[activeAnalysis.refId].doi}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-400 hover:text-brand-300 transition-colors"
+                            >
+                              View Paper <Icons.ExternalLink className="w-3 h-3" />
+                            </a>
+                         )}
                       </div>
 
                       {/* Find Better Source Button */}
@@ -304,7 +322,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ result, onReset,
                               </div>
                               
                               {betterSources.map((source, idx) => {
-                                const score = source.scores ? computeWeightedTotal(source.scores) : 0;
+                                const score = source.scores ? computeScore(source.scores) : 0;
                                 return (
                                 <div key={source.id || idx} className="p-4 bg-brand-500/10 border border-brand-500/20 rounded-xl">
                                     <div className="flex justify-between items-start mb-3">

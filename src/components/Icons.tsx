@@ -21,7 +21,9 @@ import {
   RefreshCw,
   Check,
   Link,
-  ExternalLink
+  ExternalLink,
+  Settings,
+  X
 } from 'lucide-react';
 
 // Icons mapping
@@ -53,5 +55,7 @@ export const Icons = {
   RefreshCw: RefreshCw,
   Check: Check,
   Link: Link,
-  ExternalLink: ExternalLink
+  ExternalLink: ExternalLink,
+  Settings: Settings,
+  X: X
 };

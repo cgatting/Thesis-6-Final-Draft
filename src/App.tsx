@@ -5,7 +5,9 @@ import { DocumentViewer } from './components/DocumentViewer';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { BibliographyDashboard } from './components/BibliographyDashboard';
 import { LandingPage } from './components/LandingPage';
+import { SettingsModal } from './components/SettingsModal';
 import { AnalysisService } from './services/AnalysisService';
+import { ScoringConfig, ScoringEngine } from './services/scoring/ScoringEngine';
 import { AppState, AnalysisResult } from './types';
 
 function App() {
@@ -19,6 +21,9 @@ function App() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  
+  const [scoringConfig, setScoringConfig] = useState<ScoringConfig>(ScoringEngine.DEFAULT_CONFIG);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -26,11 +31,13 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleAnalysis = async () => {
+  const handleAnalysis = async (configOverride?: ScoringConfig) => {
     if (!manuscriptText.trim() || !bibliographyText.trim()) {
       setErrorMsg("Please provide both manuscript content and a bibliography.");
       return;
     }
+
+    const configToUse = configOverride || scoringConfig;
 
     setAppState(AppState.PARSING);
     setErrorMsg(null);
@@ -40,7 +47,7 @@ function App() {
       setTimeout(async () => {
           try {
               setStatusMessage("Parsing and Vectorizing content...");
-              const service = new AnalysisService();
+              const service = new AnalysisService(configToUse);
               const analysisResult = await service.analyze(manuscriptText, bibliographyText);
               
               setResult(analysisResult);
@@ -78,7 +85,7 @@ function App() {
     
     setTimeout(async () => {
         try {
-            const service = new AnalysisService();
+            const service = new AnalysisService(scoringConfig);
             const analysisResult = await service.analyze(newManuscript, newBib);
             
             setResult(analysisResult);
@@ -112,7 +119,7 @@ function App() {
             </div>
             
             {appState === AppState.RESULTS && (
-               <div className="flex items-center gap-1 bg-slate-900/60 backdrop-blur-sm p-1.5 rounded-xl border border-white/10 shadow-inner">
+               <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-slate-900/60 backdrop-blur-sm p-1.5 rounded-xl border border-white/10 shadow-inner">
                  <button 
                    onClick={() => setActiveTab('dashboard')}
                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
@@ -145,9 +152,30 @@ function App() {
                  </button>
                </div>
             )}
+
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all border border-transparent hover:border-slate-700"
+              title="Configure Scoring"
+            >
+              <Icons.Settings className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </nav>
+
+      <SettingsModal 
+         isOpen={isSettingsOpen}
+         onClose={() => setIsSettingsOpen(false)}
+         config={scoringConfig}
+         onSave={(newConfig) => {
+           setScoringConfig(newConfig);
+           // Trigger re-analysis if we have results
+           if (appState === AppState.RESULTS && manuscriptText && bibliographyText) {
+              handleAnalysis(newConfig);
+           }
+         }}
+       />
 
       {/* Main Content */}
       <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen flex flex-col">
@@ -200,7 +228,7 @@ function App() {
                     )}
 
                     <button
-                      onClick={handleAnalysis}
+                      onClick={() => handleAnalysis()}
                       disabled={!manuscriptText || !bibliographyText}
                       className={`
                         group relative inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white transition-all duration-300 
@@ -259,7 +287,7 @@ function App() {
         {appState === AppState.RESULTS && result && (
            <div className="animate-fade-in w-full">
              {activeTab === 'dashboard' ? (
-                <ResultsDashboard result={result} onReset={handleReset} />
+                <ResultsDashboard result={result} onReset={handleReset} scoringConfig={scoringConfig} />
              ) : activeTab === 'document' ? (
                 <DocumentViewer 
                     result={result} 
@@ -267,6 +295,7 @@ function App() {
                     onUpdate={handleUpdate}
                     manuscriptText={manuscriptText}
                     bibliographyText={bibliographyText}
+                    scoringConfig={scoringConfig}
                 />
              ) : (
                 <BibliographyDashboard
@@ -274,6 +303,7 @@ function App() {
                   manuscriptText={manuscriptText}
                   bibliographyText={bibliographyText}
                   onUpdate={handleUpdate}
+                  scoringConfig={scoringConfig}
                 />
              )}
            </div>

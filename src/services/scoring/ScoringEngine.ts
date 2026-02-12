@@ -13,7 +13,12 @@ export interface ScoringConfig {
 }
 
 export class ScoringEngine {
-  constructor(private config: ScoringConfig = ScoringEngine.DEFAULT_CONFIG) {}
+  constructor(private config: ScoringConfig = ScoringEngine.DEFAULT_CONFIG) {
+    if (!this.config || !this.config.weights) {
+        console.warn('Invalid ScoringConfig passed to ScoringEngine, reverting to default.');
+        this.config = ScoringEngine.DEFAULT_CONFIG;
+    }
+  }
 
   public static DEFAULT_CONFIG: ScoringConfig = {
     weights: {
@@ -61,22 +66,29 @@ export class ScoringEngine {
     };
   }
 
-  public computeWeightedTotal(scores: DimensionScores): number {
+  public computeWeightedTotal(scores?: Partial<DimensionScores> | null): number {
     const w = this.config.weights;
+    if (!scores) return 0;
+    const a = typeof scores.Alignment === 'number' ? scores.Alignment : 0;
+    const n = typeof scores.Numbers === 'number' ? scores.Numbers : 0;
+    const e = typeof scores.Entities === 'number' ? scores.Entities : 0;
+    const m = typeof scores.Methods === 'number' ? scores.Methods : 0;
+    const r = typeof scores.Recency === 'number' ? scores.Recency : 0;
+    const au = typeof scores.Authority === 'number' ? scores.Authority : 0;
     return (
-      (scores.Alignment * w.Alignment) +
-      (scores.Numbers * w.Numbers) +
-      (scores.Entities * w.Entities) +
-      (scores.Methods * w.Methods) +
-      (scores.Recency * w.Recency) +
-      (scores.Authority * w.Authority)
+      (a * w.Alignment) +
+      (n * w.Numbers) +
+      (e * w.Entities) +
+      (m * w.Methods) +
+      (r * w.Recency) +
+      (au * w.Authority)
     );
   }
 
-  private calculateEntityScore(sentenceEntities: string[], refAbstract: string): number {
+  private calculateEntityScore(sentenceEntities: string[], refAbstract: string | undefined): number {
     if (sentenceEntities.length === 0) return 50; 
     
-    const abstractLower = refAbstract.toLowerCase();
+    const abstractLower = (refAbstract || '').toLowerCase();
     let matches = 0;
     
     sentenceEntities.forEach(entity => {
@@ -99,14 +111,14 @@ export class ScoringEngine {
     return 20;
   }
 
-  private calculateNumberScore(hasNumbers: boolean, refAbstract: string): number {
+  private calculateNumberScore(hasNumbers: boolean, refAbstract: string | undefined): number {
     if (!hasNumbers) return 100;
-    const abstractHasNumbers = /\d/.test(refAbstract);
+    const abstractHasNumbers = refAbstract ? /\d/.test(refAbstract) : false;
     return abstractHasNumbers ? 100 : 30;
   }
 }
 
 // Standalone export for UI
-export const computeWeightedTotal = (scores: DimensionScores): number => {
+export const computeWeightedTotal = (scores?: Partial<DimensionScores> | null): number => {
     return new ScoringEngine().computeWeightedTotal(scores);
 };

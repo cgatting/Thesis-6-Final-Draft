@@ -13,9 +13,14 @@ export class AnalysisService {
   private entityExtractor = new EntityExtractor();
   private bibParser = new BibTexParser();
   private latexParser = new LatexParser();
-  private scoringEngine = new ScoringEngine();
   private oaService = new OpenAlexService();
-  private citationFinder = new CitationFinderService();
+  private citationFinder: CitationFinderService;
+  private scoringEngine: ScoringEngine;
+
+  constructor(config?: any) {
+    this.scoringEngine = new ScoringEngine(config);
+    this.citationFinder = new CitationFinderService(config);
+  }
 
   public async analyze(manuscriptText: string, bibText: string): Promise<AnalysisResult> {
     console.log('Starting analysis...');
