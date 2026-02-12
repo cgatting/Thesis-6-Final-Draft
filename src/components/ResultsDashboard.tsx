@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { AnalysisResult, ProcessedReference } from '../types';
 import { ScoreRadar } from './RadarChart';
+import { ScatterPlot } from './ScatterPlot';
 import { Icons } from './Icons';
 import { computeWeightedTotal } from '../services/scoring/ScoringEngine';
+import { generatePDF } from '../utils/pdfGenerator';
 
 interface ResultsDashboardProps {
   result: AnalysisResult;
@@ -13,6 +15,13 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
   const [filter, setFilter] = useState('');
   const [sortField, setSortField] = useState<'id' | 'title' | 'year' | 'score'>('id');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    await generatePDF('dashboard-content', result.documentTitle || 'RefScore_Report');
+    setIsExporting(false);
+  };
 
   const references = Object.values(result.references) as ProcessedReference[];
   
@@ -73,7 +82,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
   };
 
   return (
-    <div className="space-y-8 pb-12 animate-fade-in">
+    <div id="dashboard-content" className="space-y-8 pb-12 animate-fade-in bg-slate-950 p-8">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
         <div>
@@ -85,10 +94,17 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
             Generated on {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <button className="px-5 py-2.5 text-sm font-bold text-slate-900 bg-slate-100 hover:bg-brand-50 rounded-xl shadow-lg shadow-black/10 hover:shadow-brand-500/20 transition-all flex items-center gap-2 active:scale-95">
-            <Icons.Upload className="w-4 h-4 rotate-180" />
-            Export
+        <div className="flex items-center gap-3 w-full md:w-auto" data-html2canvas-ignore>
+          <button 
+            onClick={handleExport}
+            disabled={isExporting}
+            className="px-5 py-2.5 text-sm font-bold text-slate-900 bg-slate-100 hover:bg-brand-50 rounded-xl shadow-lg shadow-black/10 hover:shadow-brand-500/20 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            {isExporting ? (
+              <Icons.RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Icons.Upload className="w-4 h-4 rotate-180" />
+            )}
+            {isExporting ? 'Exporting...' : 'Export PDF'}
           </button>
         </div>
       </div>
@@ -155,6 +171,11 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
             <div className="text-slate-400 text-sm font-medium">Average Reference Age</div>
           </div>
         </div>
+      </div>
+
+      {/* NEW: Scatter Plot Section */}
+      <div className="animate-fade-in-up delay-100">
+        <ScatterPlot references={references} />
       </div>
 
       {/* Dimension Analysis */}
@@ -364,6 +385,43 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
               ))}
             </ul>
           </div>
+
+          {/* Smart Suggestions */}
+          {result.analyzedSentences.some(s => s.suggestedReferences && s.suggestedReferences.length > 0) && (
+            <div className="glass-card rounded-3xl p-6 border border-white/5 animate-fade-in-up">
+              <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <Icons.Lightbulb className="w-5 h-5 text-yellow-400" />
+                Smart Suggestions
+              </h3>
+              <div className="space-y-4">
+                {result.analyzedSentences
+                  .filter(s => s.suggestedReferences && s.suggestedReferences.length > 0)
+                  .map((s, i) => (
+                    <div key={i} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                      <p className="text-xs text-slate-400 mb-3 italic">"{s.text.substring(0, 100)}..."</p>
+                      <div className="space-y-2">
+                        {s.suggestedReferences?.map((ref, j) => (
+                          <a 
+                            key={j} 
+                            href={ref.doi ? `https://doi.org/${ref.doi}` : '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block p-2 rounded-lg bg-slate-900 hover:bg-slate-800 transition-colors border border-slate-800 hover:border-brand-500/30 group"
+                          >
+                            <div className="font-bold text-slate-200 text-xs group-hover:text-brand-400 transition-colors line-clamp-1">{ref.title}</div>
+                            <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                              <span>{ref.authors[0]} et al.</span>
+                              <span>{ref.year}</span>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          )}
 
         </div>
 

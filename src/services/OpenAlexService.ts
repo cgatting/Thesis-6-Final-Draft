@@ -155,6 +155,7 @@ export class OpenAlexService {
       venue: paper.primary_location?.source?.display_name || "Unknown Venue",
       abstract: paper.abstract || "No abstract available.",
       doi: paper.doi ? paper.doi.replace('https://doi.org/', '') : undefined,
+      citationCount: paper.cited_by_count,
       scores: scores
     };
   }

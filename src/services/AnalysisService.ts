@@ -5,6 +5,7 @@ import { BibTexParser } from './parsers/BibTexParser';
 import { LatexParser } from './parsers/LatexParser';
 import { ScoringEngine } from './scoring/ScoringEngine';
 import { OpenAlexService } from './OpenAlexService';
+import { CitationFinderService } from './CitationFinderService';
 import { unwrap } from '../utils/result';
 
 export class AnalysisService {
@@ -14,6 +15,7 @@ export class AnalysisService {
   private latexParser = new LatexParser();
   private scoringEngine = new ScoringEngine();
   private oaService = new OpenAlexService();
+  private citationFinder = new CitationFinderService();
 
   public async analyze(manuscriptText: string, bibText: string): Promise<AnalysisResult> {
     console.log('Starting analysis...');
@@ -57,6 +59,11 @@ export class AnalysisService {
 
           // Pre-populate scores with real data
           ref.scores = oaScores;
+          
+          // Update citation count
+          if (oaPaper.cited_by_count !== undefined) {
+             ref.citationCount = oaPaper.cited_by_count;
+          }
         }
       });
     }
@@ -86,7 +93,7 @@ export class AnalysisService {
     // Helper to accumulate scores for references
     const referenceScoreAccumulator: Record<string, DimensionScores[]> = {};
 
-    const analyzedSentences: AnalyzedSentence[] = sentences.map(sentence => {
+    const analyzedSentences = await Promise.all(sentences.map(async sentence => {
       // a. Embedding
       sentence.embedding = this.vectorizer.transform(sentence.text);
       
@@ -132,16 +139,30 @@ export class AnalysisService {
       if (missingCitationTrigger) {
         sentence.analysisNotes.push(`Flagged as a claim requiring evidence due to the phrase "${missingCitationTrigger}".`);
         sentence.analysisNotes.push("Consider adding a citation or clarifying if this is your own finding.");
+        
+        // Smart Gap Filling: Suggest papers
+        const suggestions = await this.citationFinder.findSourcesForGap(sentence.text);
+        if (suggestions.length > 0) {
+            sentence.suggestedReferences = suggestions;
+            sentence.analysisNotes.push(`Found ${suggestions.length} potential sources to support this claim.`);
+        }
       }
       if (highImpactTrigger) {
         sentence.analysisNotes.push(`High-impact statement detected via "${highImpactTrigger}".`);
       }
       if (gapTrigger) {
         sentence.analysisNotes.push(`Identifies a potential research gap using "${gapTrigger}".`);
+        
+        // Smart Gap Filling: Suggest papers for the gap
+        const suggestions = await this.citationFinder.findSourcesForGap(sentence.text);
+        if (suggestions.length > 0) {
+            sentence.suggestedReferences = suggestions;
+            sentence.analysisNotes.push(`Found ${suggestions.length} relevant papers for this topic.`);
+        }
       }
 
       return sentence;
-    });
+    }));
 
     // 5.5 Aggregate Scores back to References
     Object.keys(referenceScoreAccumulator).forEach(refId => {
@@ -181,8 +202,14 @@ export class AnalysisService {
     // 7. Generate Summary (Stub)
     const summary = `Analyzed ${sentences.length} sentences against ${references.length} references. Overall alignment score: ${finalScore}/100.`;
 
-    // 8. Identify Gaps (Stub)
-    const gaps = ["No major gaps detected."];
+    // 8. Identify Gaps from Analyzed Sentences
+    const gaps = analyzedSentences
+      .filter(s => s.gapIdentified || s.isMissingCitation)
+      .map(s => s.triggerPhrase ? `Gap detected via "${s.triggerPhrase}" in: "${s.text.substring(0, 50)}..."` : `Gap in: "${s.text.substring(0, 50)}..."`);
+    
+    if (gaps.length === 0) {
+        gaps.push("No major gaps detected.");
+    }
 
     // 9. Aggregate Dimension Scores (Average across all citations)
     // This is a bit rough, but suffices for now

@@ -15,6 +15,7 @@ export interface ProcessedReference {
   year: number;
   venue?: string;
   doi?: string;
+  citationCount?: number;
   embedding?: number[]; // Vector representation
   scores?: DimensionScores;
   relevanceSummary?: string;
@@ -34,6 +35,7 @@ export interface AnalyzedSentence {
   gapIdentified?: boolean;
   triggerPhrase?: string;
   analysisNotes?: string[];
+  suggestedReferences?: ProcessedReference[];
 }
 
 export interface AnalysisResult {

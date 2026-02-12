@@ -16,7 +16,11 @@ import {
   Clock,
   Info,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Lightbulb,
+  RefreshCw,
+  Check,
+  Link
 } from 'lucide-react';
 
 // Icons mapping
@@ -29,6 +33,7 @@ export const Icons = {
   Success: CheckCircle,
   CheckCircle: CheckCircle,
   Warning: AlertTriangle,
+  AlertTriangle: AlertTriangle,
   Chart: ChartBar,
   Alignment: Layers,
   Recency: Calendar,
@@ -42,5 +47,9 @@ export const Icons = {
   Clock: Clock,
   Info: Info,
   ChevronUp: ChevronUp,
-  ChevronDown: ChevronDown
+  ChevronDown: ChevronDown,
+  Lightbulb: Lightbulb,
+  RefreshCw: RefreshCw,
+  Check: Check,
+  Link: Link
 };

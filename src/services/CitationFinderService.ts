@@ -34,6 +34,32 @@ export class CitationFinderService {
 
     if (candidates.length === 0) return [];
 
+    return this.scoreAndRankCandidates(candidates, contextSentence);
+  }
+
+  /**
+   * Finds papers to fill a detected research gap or missing citation.
+   */
+  public async findSourcesForGap(contextSentence: string): Promise<ProcessedReference[]> {
+    // Extract potential search terms
+    const keywords = contextSentence
+      .split(/\W+/)
+      .filter(w => w.length > 5 && !['however', 'because', 'although', 'studies', 'shown', 'research', 'indicated'].includes(w.toLowerCase()))
+      .slice(0, 4)
+      .join(' ');
+
+    if (!keywords) return [];
+
+    console.log(`Searching OpenAlex for gap filling: "${keywords}"`);
+    
+    const candidates = await this.oaService.searchPapers(keywords, 10);
+    
+    if (candidates.length === 0) return [];
+
+    return this.scoreAndRankCandidates(candidates, contextSentence);
+  }
+
+  private scoreAndRankCandidates(candidates: ProcessedReference[], contextSentence: string): ProcessedReference[] {
     // 1. Prepare Corpus (Context + Candidates)
     const corpus = [
       contextSentence,
@@ -52,7 +78,7 @@ export class CitationFinderService {
       embedding: sentenceEmbedding,
       entities: sentenceEntities,
       hasNumbers: /\d/.test(contextSentence),
-      isMissingCitation: false, // Not relevant here
+      isMissingCitation: false,
       isHighImpact: false,
       gapIdentified: false,
       citations: []
