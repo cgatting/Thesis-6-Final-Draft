@@ -84,7 +84,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
   return (
     <div id="dashboard-content" className="space-y-8 pb-12 animate-fade-in bg-slate-950 p-8">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between pdf-section">
         <div>
           <h2 className="text-3xl font-display font-bold text-slate-100 tracking-tight">
             Analysis Report{result.documentTitle ? `: ${result.documentTitle}` : ''}
@@ -110,7 +110,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
       </div>
 
       {/* Overview Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pdf-section">
         {/* Main Score */}
         <div className="col-span-1 md:col-span-2 bg-slate-900 rounded-3xl p-8 text-slate-100 shadow-xl border border-slate-800">
           
@@ -174,12 +174,12 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
       </div>
 
       {/* NEW: Scatter Plot Section */}
-      <div className="animate-fade-in-up delay-100">
+      <div className="animate-fade-in-up delay-100 pdf-section">
         <ScatterPlot references={references} />
       </div>
 
       {/* Dimension Analysis */}
-      <div>
+      <div className="pdf-section">
         <h3 className="text-xl font-display font-bold text-white mb-6 flex items-center gap-2">
           <Icons.Layers className="w-5 h-5 text-brand-400" />
           Dimension Breakdown
@@ -326,7 +326,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result, onRe
         </div>
 
         {/* Right Column: Insights & Summary */}
-        <div className="space-y-6">
+        <div className="space-y-6 pdf-section">
           
           {/* Executive Summary */}
           <div className="glass-card rounded-3xl p-6 relative overflow-hidden group">
