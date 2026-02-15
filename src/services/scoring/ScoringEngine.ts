@@ -10,6 +10,7 @@ export interface ScoringConfig {
     Recency: number;
     Authority: number;
   };
+  deepSearchEnabled?: boolean;
 }
 
 export class ScoringEngine {
@@ -28,7 +29,8 @@ export class ScoringEngine {
       Methods: 0.15,
       Recency: 0.10,
       Authority: 0.15
-    }
+    },
+    deepSearchEnabled: false
   };
 
   public calculateScore(sentence: AnalyzedSentence, reference: ProcessedReference): DimensionScores {

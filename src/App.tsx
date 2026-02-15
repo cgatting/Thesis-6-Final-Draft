@@ -7,6 +7,7 @@ import { BibliographyDashboard } from './components/BibliographyDashboard';
 import { LandingPage } from './components/LandingPage';
 import { SettingsModal } from './components/SettingsModal';
 import { AnalysisService } from './services/AnalysisService';
+import { DeepSearchClient } from './services/DeepSearchClient';
 import { ScoringConfig, ScoringEngine } from './services/scoring/ScoringEngine';
 import { AppState, AnalysisResult } from './types';
 
@@ -21,9 +22,11 @@ function App() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [deepSearchProgress, setDeepSearchProgress] = useState(0);
   
   const [scoringConfig, setScoringConfig] = useState<ScoringConfig>(ScoringEngine.DEFAULT_CONFIG);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [autoGenerateBib, setAutoGenerateBib] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -32,12 +35,13 @@ function App() {
   }, []);
 
   const handleAnalysis = async (configOverride?: ScoringConfig) => {
-    if (!manuscriptText.trim() || !bibliographyText.trim()) {
-      setErrorMsg("Please provide both manuscript content and a bibliography.");
+    const configToUse = configOverride || scoringConfig;
+    const deepSearchFlag = !!(configToUse.deepSearchEnabled || autoGenerateBib);
+
+    if (!manuscriptText.trim() || (!deepSearchFlag && !bibliographyText.trim())) {
+      setErrorMsg(deepSearchFlag ? "Please provide manuscript content." : "Please provide both manuscript content and a bibliography, or enable Generate References.");
       return;
     }
-
-    const configToUse = configOverride || scoringConfig;
 
     setAppState(AppState.PARSING);
     setErrorMsg(null);
@@ -46,9 +50,26 @@ function App() {
     try {
       setTimeout(async () => {
           try {
+              let nextManuscript = manuscriptText;
+              let nextBibliography = bibliographyText;
+
+              if (deepSearchFlag) {
+                setStatusMessage("Initializing DeepSearch refinement...");
+                const client = new DeepSearchClient();
+                const refined = await client.refineDocument(manuscriptText, (pct, msg) => {
+                    setDeepSearchProgress(pct);
+                    setStatusMessage(msg);
+                });
+                nextManuscript = refined.processedText;
+                nextBibliography = refined.bibliographyText;
+                setManuscriptText(nextManuscript);
+                setBibliographyText(nextBibliography);
+                setDeepSearchProgress(0); // Reset for next phase
+              }
+
               setStatusMessage("Parsing and Vectorizing content...");
               const service = new AnalysisService(configToUse);
-              const analysisResult = await service.analyze(manuscriptText, bibliographyText);
+              const analysisResult = await service.analyze(nextManuscript, nextBibliography);
               
               setResult(analysisResult);
               setAppState(AppState.RESULTS);
@@ -73,6 +94,7 @@ function App() {
     setErrorMsg(null);
     setManuscriptText('');
     setBibliographyText('');
+    setAutoGenerateBib(false);
   };
 
   const handleUpdate = async (newManuscript: string, newBib: string) => {
@@ -216,6 +238,25 @@ function App() {
                         onChange={setBibliographyText}
                         accept=".bib,.json,.csv,.txt"
                       />
+                      <div className="mt-6 flex items-center justify-between p-3 rounded-xl border border-slate-700/60 bg-slate-900/40">
+                        <div className="space-y-0.5">
+                          <div className="text-sm font-bold text-slate-200">Generate References Automatically</div>
+                          <div className="text-xs text-slate-400">No .bib file? Use DeepSearch to build citations and BibTeX</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setAutoGenerateBib(prev => !prev)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            autoGenerateBib ? 'bg-brand-500' : 'bg-slate-700'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              autoGenerateBib ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
                     </div>
                  </div>
                  
@@ -227,20 +268,26 @@ function App() {
                       </div>
                     )}
 
+                    {autoGenerateBib && (
+                      <div className="mb-4 px-3 py-2 text-xs text-slate-300 bg-slate-800/50 rounded-lg border border-slate-700/60">
+                        DeepSearch will refine your manuscript and generate a bibliography automatically.
+                      </div>
+                    )}
+
                     <button
                       onClick={() => handleAnalysis()}
-                      disabled={!manuscriptText || !bibliographyText}
+                      disabled={!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))}
                       className={`
                         group relative inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white transition-all duration-300 
                         rounded-2xl shadow-xl shadow-brand-500/30 focus:outline-none focus:ring-4 focus:ring-brand-500/20 active:scale-95
-                        ${(!manuscriptText || !bibliographyText) 
+                        ${(!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))) 
                           ? 'bg-slate-800 cursor-not-allowed shadow-none opacity-50' 
                           : 'bg-brand-600 hover:bg-brand-500 hover:shadow-brand-600/40 hover:-translate-y-1'
                         }
                       `}
                     >
                       Analyze Documents
-                      <Icons.ArrowRight className={`ml-2 w-5 h-5 transition-transform duration-300 ${(!manuscriptText || !bibliographyText) ? '' : 'group-hover:translate-x-1'}`} />
+                      <Icons.ArrowRight className={`ml-2 w-5 h-5 transition-transform duration-300 ${(!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))) ? '' : 'group-hover:translate-x-1'}`} />
                     </button>
                  </div>
                </div>
@@ -270,16 +317,25 @@ function App() {
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in flex-1">
             <div className="w-full max-w-md space-y-4">
               <div className="flex justify-between items-center text-sm font-medium text-slate-400">
-                <span>Processing Content</span>
-                <span className="text-brand-400">{Math.round(appState === AppState.PARSING ? 33 : appState === AppState.EMBEDDING ? 66 : 90)}%</span>
+                <span>{deepSearchProgress > 0 ? "Refining Document" : "Processing Content"}</span>
+                <span className="text-brand-400">
+                    {deepSearchProgress > 0 
+                        ? `${Math.round(deepSearchProgress)}%` 
+                        : `${Math.round(appState === AppState.PARSING ? 33 : appState === AppState.EMBEDDING ? 66 : 90)}%`
+                    }
+                </span>
               </div>
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                 <div className={`h-full bg-brand-600 transition-all duration-1000 ease-out rounded-full ${
-                    appState === AppState.PARSING ? 'w-1/3' :
-                    appState === AppState.EMBEDDING ? 'w-2/3' : 'w-full'
-                 }`}></div>
+                 <div 
+                    className="h-full bg-brand-600 transition-all duration-300 ease-out rounded-full"
+                    style={{ 
+                        width: deepSearchProgress > 0 
+                            ? `${deepSearchProgress}%` 
+                            : `${appState === AppState.PARSING ? 33 : appState === AppState.EMBEDDING ? 66 : 100}%` 
+                    }}
+                 ></div>
               </div>
-              <p className="text-slate-500 text-sm text-center">{statusMessage}</p>
+              <p className="text-slate-500 text-sm text-center animate-pulse">{statusMessage}</p>
             </div>
           </div>
         )}
