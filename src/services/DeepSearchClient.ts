@@ -11,8 +11,29 @@ export class DeepSearchClient {
   private wsUrl: string;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || (import.meta.env.VITE_DEEPSEARCH_API_URL as string) || "http://localhost:8000";
-    this.wsUrl = this.baseUrl.replace(/^http/, 'ws') + '/ws';
+    if (baseUrl) {
+      this.baseUrl = baseUrl;
+    } else if (import.meta.env.VITE_DEEPSEARCH_API_URL) {
+      this.baseUrl = import.meta.env.VITE_DEEPSEARCH_API_URL as string;
+    } else {
+      // Default to current origin if not specified (for production)
+      // If we are in development (localhost:3000/5173), we might want to default to localhost:8000
+      // but usually VITE_DEEPSEARCH_API_URL should be set in .env for dev.
+      // For Docker/Production where frontend is served by backend, empty string implies relative path.
+      this.baseUrl = "";
+    }
+
+    if (this.baseUrl.startsWith('http')) {
+      this.wsUrl = this.baseUrl.replace(/^http/, 'ws') + '/ws';
+    } else if (this.baseUrl === "") {
+        // Relative path, construct absolute WS URL based on current location
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        this.wsUrl = `${protocol}//${window.location.host}/ws`;
+    } else {
+        // Fallback or assuming baseUrl is just a path like "/api"
+         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+         this.wsUrl = `${protocol}//${window.location.host}${this.baseUrl}/ws`;
+    }
   }
 
   public async refineDocument(manuscriptText: string, onProgress?: ProgressCallback): Promise<DeepSearchRefineResponse> {

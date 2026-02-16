@@ -439,7 +439,7 @@ class ResearchSearchEngine:
                 await asyncio.sleep(self.min_request_interval - time_since_last_request)
             self.last_request_time = time.time()
 
-    async def search_papers(self, query: str, limit: int = 500) -> List[Dict]:
+    async def search_papers(self, query: str, limit: int = 20) -> List[Dict]:
         async with aiohttp.ClientSession(headers=self.headers) as session:
             for attempt in range(self.max_retries):
                 try:
@@ -500,10 +500,13 @@ class ResearchSearchEngine:
 
 # ---------------- Document Refiner ----------------
 class DocumentRefiner:
-    def __init__(self, settings: dict, view):
+    def __init__(self, settings: dict, view, nlp_processor=None):
         self.settings = settings
         self.view = view
-        self.nlp_processor = NLPProcessor(settings)
+        if nlp_processor:
+            self.nlp_processor = nlp_processor
+        else:
+            self.nlp_processor = NLPProcessor(settings)
         self.search_engine = ResearchSearchEngine()
         self.bibliography = {}
         self.bib_lock = threading.Lock()
@@ -542,9 +545,10 @@ class DocumentRefiner:
         """Improved document refinement with parallel async processing."""
         if len(doc_text) > MAX_DOCUMENT_SIZE:
             raise ValueError(f"Document size exceeds maximum limit of {MAX_DOCUMENT_SIZE/1024/1024}MB")
-            
+        self.view.update_progress(0.01, "Preparing manuscript...")
         sentences = nltk.sent_tokenize(doc_text)
         total = len(sentences)
+        self.view.update_progress(0.02, f"Detected {total} sentences; starting parallel refinement...")
         processed_sentences = [None] * total  # Pre-allocate list
         
         # Limit concurrency to avoid overwhelming the system
@@ -605,7 +609,7 @@ class DocumentRefiner:
         return self.nlp_processor.refine_query(sentence)
 
     async def _search_papers_async(self, query: str) -> List[Dict]:
-        return self.search_engine.search_papers(query, limit=self.settings.get('search_settings', {}).get('max_results', 500))
+        return await self.search_engine.search_papers(query, limit=self.settings.get('search_settings', {}).get('max_results', 20))
 
     async def _find_best_match_async(self, sentence: str, search_results: List[Dict]) -> Dict:
         best_result = None
@@ -626,8 +630,7 @@ class DocumentRefiner:
             combined_text = f"{title} {abstract}"
             similarity = self.nlp_processor.calculate_similarity_with_embedding(sentence_emb, combined_text)
             
-            # Use lowered threshold from previous fix
-            threshold = self.settings.get('similarity_threshold', 0.5)
+            threshold = self.settings.get('similarity_threshold', 0.3)
             if similarity < threshold:
                 continue
 
@@ -1367,15 +1370,15 @@ class DeepResearchToolApp:
 
         rows_label = ctk.CTkLabel(params_frame, text="Max Results")
         rows_label.pack(side="left", padx=(5, 2))
-        self.sources_rows = ctk.CTkComboBox(params_frame, values=["50", "100", "200", "500"])
+        self.sources_rows = ctk.CTkComboBox(params_frame, values=["20", "50", "100", "200", "500"])
         self.sources_rows.pack(side="left", padx=5)
-        self.sources_rows.set(str(self.settings.get('search_settings', {}).get('max_results', 500)))
+        self.sources_rows.set(str(self.settings.get('search_settings', {}).get('max_results', 20)))
 
         thr_label = ctk.CTkLabel(params_frame, text="Similarity Threshold")
         thr_label.pack(side="left", padx=(15, 2))
         self.sources_thr = ctk.CTkEntry(params_frame, width=80)
         self.sources_thr.pack(side="left", padx=5)
-        self.sources_thr.insert(0, str(self.settings.get('similarity_threshold', 0.7)))
+        self.sources_thr.insert(0, str(self.settings.get('similarity_threshold', 0.3)))
 
         self.sources_use_refine = ctk.CTkSwitch(params_frame, text="Use Refined Query")
         self.sources_use_refine.pack(side="left", padx=15)
@@ -1864,11 +1867,11 @@ class DeepResearchToolApp:
         try:
             rows = int(self.sources_rows.get())
         except Exception:
-            rows = self.settings.get('search_settings', {}).get('max_results', 500)
+            rows = self.settings.get('search_settings', {}).get('max_results', 20)
         try:
             thr = float(self.sources_thr.get())
         except Exception:
-            thr = float(self.settings.get('similarity_threshold', 0.7))
+            thr = float(self.settings.get('similarity_threshold', 0.3))
         use_refine = bool(self.sources_use_refine.get())
 
         self.sources_run_button.configure(state="disabled")
@@ -1884,7 +1887,7 @@ class DeepResearchToolApp:
             def progress_cb(val, status):
                 self.update_progress(val, status)
             self.update_progress(0.0, "Initializing source ranking...")
-            results = self.source_ranking.rank_top_sources(text, rows, thr, use_refine, progress_cb)
+            results = await self.source_ranking.rank_top_sources(text, rows, thr, use_refine, progress_cb)
             self.update_sources_results(results)
             self.update_progress(1.0, "Source ranking complete")
             self.log_to_console("Relevant sources computed.")
@@ -2120,12 +2123,12 @@ def reset_section_to_defaults(settings: dict, section: str, defaults: dict) -> d
 def validate_settings(settings: dict) -> Dict[str, str]:
     errors: Dict[str, str] = {}
     try:
-        thr = settings.get('similarity_threshold', 0.7)
+        thr = settings.get('similarity_threshold', 0.3)
         if not isinstance(thr, (int, float)) or not (0.0 <= float(thr) <= 1.0):
             errors['similarity_threshold'] = 'Must be a number between 0 and 1'
 
         ss = settings.get('search_settings', {})
-        if int(ss.get('max_results', 500)) <= 0:
+        if int(ss.get('max_results', 20)) <= 0:
             errors['search_settings.max_results'] = 'Must be a positive integer'
         if float(ss.get('rate_limit', 1.0)) < 0.0:
             errors['search_settings.rate_limit'] = 'Must be non-negative seconds'
@@ -2227,7 +2230,7 @@ def generate_bibtex_from_sources(results: List[Dict[str, Any]]) -> str:
 # ---------------- Default Settings ----------------
 DEFAULT_SETTINGS = {
     'version': 1,
-    'similarity_threshold': 0.7,
+    'similarity_threshold': 0.3,
     'keyword_settings': {
         'lan': 'en',
         'n': 2,
@@ -2235,7 +2238,7 @@ DEFAULT_SETTINGS = {
         'top': 10
     },
     'search_settings': {
-        'max_results': 500,
+        'max_results': 20,
         'rate_limit': 1.0,
         'enable_snowballing': False,
         'snowballing_depth': 1

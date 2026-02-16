@@ -34,12 +34,15 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleAnalysis = async (configOverride?: ScoringConfig) => {
-    const configToUse = configOverride || scoringConfig;
-    const deepSearchFlag = !!(configToUse.deepSearchEnabled || autoGenerateBib);
+  useEffect(() => {
+    setScoringConfig(prev => ({ ...prev, deepSearchEnabled: autoGenerateBib }));
+  }, [autoGenerateBib]);
 
-    if (!manuscriptText.trim() || (!deepSearchFlag && !bibliographyText.trim())) {
-      setErrorMsg(deepSearchFlag ? "Please provide manuscript content." : "Please provide both manuscript content and a bibliography, or enable Generate References.");
+  const handleAnalysis = async (configOverride?: ScoringConfig) => {
+    const deepSearchFlag = !!autoGenerateBib;
+
+    if (!manuscriptText.trim() || (!autoGenerateBib && !bibliographyText.trim())) {
+      setErrorMsg(autoGenerateBib ? "Please provide manuscript content." : "Please provide both manuscript content and a bibliography, or enable Generate References.");
       return;
     }
 
@@ -61,14 +64,16 @@ function App() {
                     setStatusMessage(msg);
                 });
                 nextManuscript = refined.processedText;
-                nextBibliography = refined.bibliographyText;
+                nextBibliography = (refined.bibtex && refined.bibtex.trim().length > 0)
+                  ? refined.bibtex
+                  : (refined.bibliographyText || nextBibliography);
                 setManuscriptText(nextManuscript);
                 setBibliographyText(nextBibliography);
                 setDeepSearchProgress(0); // Reset for next phase
               }
 
               setStatusMessage("Parsing and Vectorizing content...");
-              const service = new AnalysisService(configToUse);
+              const service = new AnalysisService(scoringConfig);
               const analysisResult = await service.analyze(nextManuscript, nextBibliography);
               
               setResult(analysisResult);
@@ -276,18 +281,18 @@ function App() {
 
                     <button
                       onClick={() => handleAnalysis()}
-                      disabled={!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))}
+                      disabled={!manuscriptText || (!bibliographyText && !autoGenerateBib)}
                       className={`
                         group relative inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white transition-all duration-300 
                         rounded-2xl shadow-xl shadow-brand-500/30 focus:outline-none focus:ring-4 focus:ring-brand-500/20 active:scale-95
-                        ${(!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))) 
+                        ${(!manuscriptText || (!bibliographyText && !autoGenerateBib)) 
                           ? 'bg-slate-800 cursor-not-allowed shadow-none opacity-50' 
                           : 'bg-brand-600 hover:bg-brand-500 hover:shadow-brand-600/40 hover:-translate-y-1'
                         }
                       `}
                     >
                       Analyze Documents
-                      <Icons.ArrowRight className={`ml-2 w-5 h-5 transition-transform duration-300 ${(!manuscriptText || (!bibliographyText && !(scoringConfig.deepSearchEnabled || autoGenerateBib))) ? '' : 'group-hover:translate-x-1'}`} />
+                      <Icons.ArrowRight className={`ml-2 w-5 h-5 transition-transform duration-300 ${(!manuscriptText || (!bibliographyText && !autoGenerateBib)) ? '' : 'group-hover:translate-x-1'}`} />
                     </button>
                  </div>
                </div>

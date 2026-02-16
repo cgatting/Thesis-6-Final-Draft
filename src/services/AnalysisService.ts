@@ -27,7 +27,7 @@ export class AnalysisService {
 
     // 1. Parse Inputs
     const referencesResult = this.bibParser.parse(bibText);
-    const references = unwrap(referencesResult); // Will throw if parsing fails
+    const references = referencesResult.ok ? referencesResult.value : [];
     
     const sentencesResult = this.latexParser.parse(manuscriptText);
     const sentences = unwrap(sentencesResult);

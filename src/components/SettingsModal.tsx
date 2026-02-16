@@ -95,25 +95,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, c
             ))}
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl border border-slate-700/60 bg-slate-900/40">
-            <div className="space-y-1">
-              <div className="text-sm font-bold text-slate-200">DeepSearch Refinement</div>
-              <div className="text-xs text-slate-400">Uses the local Python API to insert citations and build a bibliography</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setDeepSearchEnabled(prev => !prev)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                deepSearchEnabled ? 'bg-brand-500' : 'bg-slate-700'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  deepSearchEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
+          
 
           {/* Total Indicator */}
           <div className={`flex justify-between items-center p-4 rounded-xl border ${
