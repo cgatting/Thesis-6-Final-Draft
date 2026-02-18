@@ -1,3 +1,13 @@
+---
+title: RefScore
+emoji: 🚀
+colorFrom: indigo
+colorTo: indigo
+sdk: docker
+pinned: false
+license: mit
+---
+
 # RefScore
 
 RefScore is a multi-dimensional algorithmic system for automated academic reference analysis and document alignment. It leverages the OpenAlex API and local NLP techniques (TF-IDF, Entity Extraction) to validate citations, ensure authority, and perfect your bibliography.
