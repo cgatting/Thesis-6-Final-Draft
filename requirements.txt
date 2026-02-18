@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+requests
+aiohttp
+nltk
+torch
+yake
+sentence-transformers
+transformers
+scikit-learn
+customtkinter
+packaging
+ninja
+python-multipart

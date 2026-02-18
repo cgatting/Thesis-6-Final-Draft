@@ -14,7 +14,30 @@ export default defineConfig(({ mode }) => {
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api\/semanticscholar/, ''),
           },
+          '/refine': {
+            target: 'http://localhost:8000',
+            changeOrigin: true,
+            secure: false,
+          },
+          '/ws': {
+            target: 'ws://localhost:8000',
+            ws: true,
+            changeOrigin: true,
+            secure: false,
+          }
         },
+      },
+      build: {
+        outDir: 'dist',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom'],
+                    charts: ['recharts'],
+                    pdf: ['jspdf', 'html2canvas']
+                }
+            }
+        }
       },
       plugins: [react()],
       test: {
